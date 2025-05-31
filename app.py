@@ -127,22 +127,46 @@ labels = (
 bar = (bars + labels).properties(height=alt.Step(22))
 
 # Boxplot: Nightly-Price Distribution by Room Type
-boxplot = (
+# base box-and-whisker 
+box = (
     alt.Chart(df)
     .mark_boxplot(extent="min-max")
     .encode(
         y=alt.Y("room_type:N", sort="-x", title="Room Type"),
         x=alt.X("price:Q", title="Nightly Price ($)"),
         color=room_color,
+    )
+)
+
+# invisible dot holding the full summary for the tooltip
+stats = (
+    alt.Chart(df)
+    .transform_aggregate(
+        median_price="median(price)",
+        q1_price="q1(price)",
+        q3_price="q3(price)",
+        min_price="min(price)",
+        max_price="max(price)",
+        groupby=["room_type"],
+    )
+    .mark_circle(size=0, opacity=0)            
+    .encode(
+        y="room_type:N",
+        x="median_price:Q",                     
         tooltip=[
             "room_type:N",
-            alt.Tooltip("median(price):Q", format="$.0f", title="Median"),
-            alt.Tooltip("q1(price):Q", format="$.0f", title="1st Quartile"),
-            alt.Tooltip("q3(price):Q", format="$.0f", title="3rd Quartile"),
-            alt.Tooltip("min(price):Q", format="$.0f", title="Min"),
-            alt.Tooltip("max(price):Q", format="$.0f", title="Max"),
+            alt.Tooltip("median_price:Q", format="$.0f", title="Median"),
+            alt.Tooltip("q1_price:Q", format="$.0f", title="1st Quartile"),
+            alt.Tooltip("q3_price:Q", format="$.0f", title="3rd Quartile"),
+            alt.Tooltip("min_price:Q", format="$.0f", title="Min"),
+            alt.Tooltip("max_price:Q", format="$.0f", title="Max"),
         ],
     )
+)
+
+# layer boxplot + invisible tooltip layer
+boxplot = (
+    (box + stats)
     .properties(height=alt.Step(28))
 )
 
