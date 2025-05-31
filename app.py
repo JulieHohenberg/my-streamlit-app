@@ -94,19 +94,27 @@ hist = (
     )
 )
 
-# Map – Albany basemap + listing dots
+# Map: Albany basemap + listing dots
 counties = alt.topo_feature(data.us_10m.url, "counties")
 
-albany_map = (
+# Mean lon/lat of the filtered data – handy auto-center
+ctr_lon = float(df["longitude"].mean())
+ctr_lat = float(df["latitude"].mean())
+
+# Background geoshape (Albany County = 36001)
+albany_bg = (
     alt.Chart(counties)
-    .mark_geoshape(fill="whitesmoke", stroke="gainsboro")
-    .transform_filter(
-        alt.datum.id == 36001  # FIPS code for Albany County, NY
+    .mark_geoshape(fill="#f0f4ff", stroke="gainsboro")
+    .transform_filter(alt.datum.id == 36001)
+    .project(
+        type="mercator",
+        center=[ctr_lon, ctr_lat],   # zoom-to-Albany
+        scale=20000                  # tweak to taste
     )
-    .project(type="mercator")
 )
 
-zoom = alt.selection_interval(bind="scales")  # drag / scroll to zoom
+# Draggable / scrollable interval selection
+zoom = alt.selection_interval(bind="scales")
 
 dots = (
     alt.Chart(df)
@@ -118,9 +126,14 @@ dots = (
         tooltip=["name:N", "price:Q", "room_type:N"],
     )
     .add_params(zoom)
+    .project(
+        type="mercator",
+        center=[ctr_lon, ctr_lat],
+        scale=20000
+    )
 )
 
-map_chart = (albany_map + dots).properties(height=400)
+map_chart = (albany_bg + dots).properties(height=400)
 
 # 2x2 grid layout
 c1, c2 = st.columns(2)
