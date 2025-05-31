@@ -54,6 +54,20 @@ room_color = alt.Color("room_type:N", title="Room Type",
 
 # charts!
 
+# Histogram: Distribution of Prices
+hist = (
+    alt.Chart(df)
+    .mark_bar()
+    .encode(
+        x=alt.X("price:Q",
+                bin=alt.Bin(maxbins=30),
+                title="Nightly Price ($)"),
+        y=alt.Y("count()", title="Number of Listings"),
+        tooltip=[alt.Tooltip("count()", title="Listings")],
+        color=room_color,
+    )
+)
+
 # Scatter: Price vs. Minimum Nights
 scatter = (
     alt.Chart(df)
@@ -124,8 +138,7 @@ with c2:
 
 d1, d2 = st.columns(2)
 with d1:
-    st.altair_chart(hist, use_container_width=True)
+    st.altair_chart(hist, use_container_width=True)   
 with d2:
     st.subheader("Listing Locations")
-    # Streamlit’s built-in map (PyDeck under the hood)
-    st.map(df[["latitude", "longitude"]], zoom=11)
+    st.pydeck_chart(deck_map, use_container_width=True)   
