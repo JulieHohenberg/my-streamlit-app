@@ -97,27 +97,25 @@ hist = (
 # Map: Albany basemap + listing dots
 counties = alt.topo_feature(data.us_10m.url, "counties")
 
-# Mean lon/lat of the filtered data – handy auto-center
-ctr_lon = float(df["longitude"].mean())
-ctr_lat = float(df["latitude"].mean())
+# Constant center on Albany, NY  (lon, lat)
+ALBANY_CENTER = [-73.7562, 42.6526]
 
-# Background geoshape (Albany County = 36001)
 albany_bg = (
     alt.Chart(counties)
     .mark_geoshape(fill="#f0f4ff", stroke="gainsboro")
-    .transform_filter(alt.datum.id == 36001)
-    .project(
-        type="mercator",
-        center=[ctr_lon, ctr_lat],   # zoom-to-Albany
-        scale=20000                  # tweak to taste
-    )
+    .transform_filter(alt.datum.id == 36001)        # Albany County FIPS
+    .project(type="mercator", center=ALBANY_CENTER, scale=25000)
 )
 
-# Draggable / scrollable interval selection
-zoom = alt.selection_interval(bind="scales")
+zoom = alt.selection_interval(bind="scales")        # drag / scroll
+
+# if the current filter leaves zero rows, Altair needs at least an empty DF
+dots_source = df if len(df) else pd.DataFrame(
+    {"longitude": [], "latitude": [], "room_type": []}
+)
 
 dots = (
-    alt.Chart(df)
+    alt.Chart(dots_source)
     .mark_circle(size=40, opacity=0.8)
     .encode(
         longitude="longitude:Q",
@@ -126,11 +124,7 @@ dots = (
         tooltip=["name:N", "price:Q", "room_type:N"],
     )
     .add_params(zoom)
-    .project(
-        type="mercator",
-        center=[ctr_lon, ctr_lat],
-        scale=20000
-    )
+    .project(type="mercator", center=ALBANY_CENTER, scale=25000)
 )
 
 map_chart = (albany_bg + dots).properties(height=400)
