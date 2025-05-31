@@ -72,39 +72,72 @@ bar_data = (
     df.groupby("room_type")
       .agg(count=("room_type", "size"),
            avg_price=("price", "mean"),
+           sd_price=("price", "std"),
            avg_min_nights=("minimum_nights", "mean"))
       .reset_index()
 )
 
+# count
 bars = (
     alt.Chart(bar_data)
     .mark_bar()
     .encode(
         y=alt.Y("room_type:N", sort="-x", title="Room Type"),
         x=alt.X("count:Q", title="Number of Listings"),
-        color=alt.Color("avg_price:Q",
-                        scale=alt.Scale(scheme="blues"),
-                        title="Avg. Nightly Price ($)"),
-        tooltip=[
-            "room_type:N",
-            alt.Tooltip("count:Q", title="Listings"),
-            alt.Tooltip("avg_price:Q", format="$.0f", title="Avg. Price"),
-            alt.Tooltip("avg_min_nights:Q", format=".1f", title="Avg. Min Nights"),
-        ],
+        color=alt.value("#4c78a8")
     )
 )
 
-# Text overlay with the exact count
+# error band of price variability
+error_band = (
+    alt.Chart(bar_data)
+    .mark_rule(color="#9ecae9", size=6, opacity=0.5)
+    .encode(
+        y="room_type:N",
+        x="avg_price:Q",
+        x2="upper:Q"
+    )
+    .transform_calculate(
+        upper="datum.avg_price + datum.sd_price",
+        lower="datum.avg_price - datum.sd_price"
+    )
+)
+
+# average price diamond mark
+price_points = (
+    alt.Chart(bar_data)
+    .mark_point(shape="diamond", size=120, color="#e45756")
+    .encode(
+        y="room_type:N",
+        x=alt.X("avg_price:Q",
+                title="Avg. Nightly Price ($)",
+                axis=alt.Axis(orient="top"))
+    )
+)
+
+# text labels / listing count
 labels = (
     bars.mark_text(
         align="left",
         baseline="middle",
-        dx=3,  # nudges text right of bar
+        dx=3,
         color="black"
-    ).encode(text=alt.Text("count:Q"))
+    ).encode(text="count:Q")
 )
 
-bar = (bars + labels).properties(height=alt.Step(28))
+# Layer elements and keep axes separate
+bar = (
+    alt.layer(bars, error_band, price_points, labels)
+       .resolve_scale(x="independent")   # separate axes for bars vs price dots
+       .encode(tooltip=[
+           "room_type:N",
+           alt.Tooltip("count:Q", title="Listings"),
+           alt.Tooltip("avg_price:Q", format="$.0f", title="Avg. Price"),
+           alt.Tooltip("sd_price:Q", format="$.0f", title="Price SD"),
+           alt.Tooltip("avg_min_nights:Q", format=".1f", title="Avg. Min Nights")
+       ])
+       .properties(height=alt.Step(28))
+)
 
 # Histogram: Distribution of Prices
 hist = (
