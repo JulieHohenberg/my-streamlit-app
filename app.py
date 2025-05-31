@@ -1,7 +1,6 @@
 import streamlit as st
 import altair as alt
 import pandas as pd
-from vega_datasets import data  # for the map!
 
 st.set_page_config(page_title="Inside Albany Airbnbs", layout="wide")
 st.title("Inside Albany’s Airbnbs")
@@ -127,7 +126,25 @@ labels = (
 
 bar = (bars + labels).properties(height=alt.Step(22))
 
-# Map: Albany basemap + listing dots
+# Boxplot: Nightly-Price Distribution by Room Type
+boxplot = (
+    alt.Chart(df)
+    .mark_boxplot(extent="min-max")
+    .encode(
+        y=alt.Y("room_type:N", sort="-x", title="Room Type"),
+        x=alt.X("price:Q", title="Nightly Price ($)"),
+        color=room_color,
+        tooltip=[
+            "room_type:N",
+            alt.Tooltip("median(price):Q", format="$.0f", title="Median"),
+            alt.Tooltip("q1(price):Q", format="$.0f", title="1st Quartile"),
+            alt.Tooltip("q3(price):Q", format="$.0f", title="3rd Quartile"),
+            alt.Tooltip("min(price):Q", format="$.0f", title="Min"),
+            alt.Tooltip("max(price):Q", format="$.0f", title="Max"),
+        ],
+    )
+    .properties(height=alt.Step(28))
+)
 
 # 2x2 grid layout
 c1, c2 = st.columns(2)
@@ -138,7 +155,8 @@ with c2:
 
 d1, d2 = st.columns(2)
 with d1:
-    st.altair_chart(hist, use_container_width=True)   
+    st.altair_chart(hist, use_container_width=True)
 with d2:
-    st.subheader("Listing Locations")
-    st.pydeck_chart(deck_map, use_container_width=True)   
+    st.subheader("Price Distribution by Room Type")
+    st.altair_chart(boxplot, use_container_width=True)
+   
