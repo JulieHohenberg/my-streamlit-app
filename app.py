@@ -140,4 +140,6 @@ d1, d2 = st.columns(2)
 with d1:
     st.altair_chart(hist, use_container_width=True)
 with d2:
-    st.altair_chart(map_chart, use_container_width=True)
+    st.subheader("Listing Locations")
+    # Streamlit’s built-in map (PyDeck under the hood)
+    st.map(df[["latitude", "longitude"]], zoom=11)
