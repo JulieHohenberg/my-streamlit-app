@@ -68,29 +68,58 @@ scatter = (
 )
 
 # Bar: Listings by Room Type
-bar_data = df.groupby("room_type").size().reset_index(name="count")
-bar = (
+bar_data = (
+    df.groupby("room_type")
+      .agg(count=("room_type", "size"),
+           avg_price=("price", "mean"),
+           avg_min_nights=("minimum_nights", "mean"))
+      .reset_index()
+)
+
+bars = (
     alt.Chart(bar_data)
     .mark_bar()
     .encode(
         y=alt.Y("room_type:N", sort="-x", title="Room Type"),
         x=alt.X("count:Q", title="Number of Listings"),
-        color=room_color,
-        tooltip=["room_type:N", "count:Q"],
+        color=alt.Color("avg_price:Q",
+                        scale=alt.Scale(scheme="blues"),
+                        title="Avg. Nightly Price ($)"),
+        tooltip=[
+            "room_type:N",
+            alt.Tooltip("count:Q", title="Listings"),
+            alt.Tooltip("avg_price:Q", format="$.0f", title="Avg. Price"),
+            alt.Tooltip("avg_min_nights:Q", format=".1f", title="Avg. Min Nights"),
+        ],
     )
 )
+
+# Text overlay with the exact count
+labels = (
+    bars.mark_text(
+        align="left",
+        baseline="middle",
+        dx=3,  # nudges text right of bar
+        color="black"
+    ).encode(text=alt.Text("count:Q"))
+)
+
+bar = (bars + labels).properties(height=alt.Step(28))
 
 # Histogram: Distribution of Prices
 hist = (
     alt.Chart(df)
     .mark_bar()
     .encode(
-        x=alt.X("price:Q",
-                bin=alt.Bin(maxbins=30),
-                title="Nightly Price ($)"),
+        x=alt.X(
+            "price:Q",
+            bin=alt.Bin(maxbins=30),
+            title="Nightly Price ($)"
+        ),
         y=alt.Y("count()", title="Number of Listings"),
-        tooltip=["count()"],
-        color=room_color,
+        # Tooltip expects either a list of field names or individual Tooltip objects
+        tooltip=[alt.Tooltip("count()", title="Number of Listings")],
+        color=room_color,   # fine if you want bars colored by room_type
     )
 )
 
