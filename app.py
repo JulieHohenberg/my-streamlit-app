@@ -173,14 +173,21 @@ boxplot = (
 # 2x2 grid layout
 c1, c2 = st.columns(2)
 with c1:
+    st.subheader("Price vs. Minimum Nights")
+    st.markdown("### Zoom/Pan & Tooltip Enabled for Additional Description") 
     st.altair_chart(scatter, use_container_width=True)
 with c2:
+    st.subheader("Listings by Room Type")
+    st.markdown("### Tooltip Enabled for Listing and Price Details")
     st.altair_chart(bar, use_container_width=True)
 
 d1, d2 = st.columns(2)
 with d1:
+    st.subheader("Distribution of Prices")
+    st.markdown("Tooltip Enabled for Number of Listings")
     st.altair_chart(hist, use_container_width=True)
 with d2:
     st.subheader("Price Distribution by Room Type")
+    st.markdown("### Tooltip Enabled for Summary Statisics")
     st.altair_chart(boxplot, use_container_width=True)
    
