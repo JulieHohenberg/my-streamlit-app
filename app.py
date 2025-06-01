@@ -189,5 +189,6 @@ with d1:
 with d2:
     st.subheader("Price Distribution by Room Type")
     st.markdown("##### Tooltip Enabled for Summary Statisics")
+    st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Relationship overview</p>", unsafe_allow_html=True)
     st.altair_chart(boxplot, use_container_width=True)
    
