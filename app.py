@@ -4,6 +4,7 @@ import pandas as pd
 
 st.set_page_config(page_title="Inside Albany Airbnbs", layout="wide")
 st.title("Inside Albany’s Airbnbs")
+st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Sidebars available for neighbourhood, room type, and nightly price filtering.</p>", unsafe_allow_html=True)
 
 # load data
 def load_data(path: str) -> pd.DataFrame:
@@ -174,21 +175,24 @@ boxplot = (
 c1, c2 = st.columns(2)
 with c1:
     st.subheader("Price vs. Minimum Nights")
-    st.markdown("##### Zoom/Pan & Tooltip Enabled for Additional Description") 
+    #st.markdown("##### Zoom/Pan & Tooltip Enabled for Additional Description") 
+    st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Zoom/Pan & Tooltip Enabled for Additional Description</p>", unsafe_allow_html=True)
     st.altair_chart(scatter, use_container_width=True)
 with c2:
     st.subheader("Listings by Room Type")
-    st.markdown("##### Tooltip Enabled for Listing and Price Details")
+    #st.markdown("##### Tooltip Enabled for Listing and Price Details")
+    st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Tooltip Enabled for Listing and Price Details</p>", unsafe_allow_html=True)
     st.altair_chart(bar, use_container_width=True)
 
 d1, d2 = st.columns(2)
 with d1:
     st.subheader("Distribution of Prices")
-    st.markdown("##### Tooltip Enabled for Number of Listings")
+    #st.markdown("##### Tooltip Enabled for Number of Listings")
+    st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Tooltip Enabled for Number of Listings</p>", unsafe_allow_html=True)
     st.altair_chart(hist, use_container_width=True)
 with d2:
     st.subheader("Price Distribution by Room Type")
-    st.markdown("##### Tooltip Enabled for Summary Statisics")
-    st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Relationship overview</p>", unsafe_allow_html=True)
+    #st.markdown("##### Tooltip Enabled for Summary Statisics")
+    st.markdown("<p style='font-size:16px; color:gray; margin-top:-10px;'>Tooltip Enabled for Summary Statisics</p>", unsafe_allow_html=True)
     st.altair_chart(boxplot, use_container_width=True)
    
