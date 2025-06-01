@@ -188,6 +188,6 @@ with d1:
     st.altair_chart(hist, use_container_width=True)
 with d2:
     st.subheader("Price Distribution by Room Type")
-    st.markdown("######## Tooltip Enabled for Summary Statisics")
+    st.markdown("####### Tooltip Enabled for Summary Statisics")
     st.altair_chart(boxplot, use_container_width=True)
    
