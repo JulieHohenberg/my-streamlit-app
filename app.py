@@ -184,7 +184,7 @@ with c2:
 d1, d2 = st.columns(2)
 with d1:
     st.subheader("Distribution of Prices")
-    st.markdown("Tooltip Enabled for Number of Listings")
+    st.markdown("### Tooltip Enabled for Number of Listings")
     st.altair_chart(hist, use_container_width=True)
 with d2:
     st.subheader("Price Distribution by Room Type")
